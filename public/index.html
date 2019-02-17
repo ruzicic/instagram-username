@@ -244,7 +244,11 @@
           fetch(url)
             .then(({ available }) => {
               submit.disabled = false;
-              setStatusOk();
+              if (available) {
+                setStatusOk();
+              } else {
+                setStatusError();
+              }
             })
             .catch(error => {
               const msg = error.message
