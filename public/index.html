@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Instagram Username - Check Availability</title>
+    <meta name="description" content="Instagram Username Availability Checker is a free tool to check if an Instagram username is available.">
+    <style media="screen">
+      body {
+        background: #eceff1;
+        color: rgba(0, 0, 0, 0.87);
+        font-family: Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        border-top: 4px solid #ffa100;
+      }
+      #message {
+        background: white;
+        max-width: 600px;
+        margin: 100px auto 16px;
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #message h1 {
+        font-size: 22px;
+        font-weight: 300;
+        color: rgba(0, 0, 0, 0.6);
+        margin: 0 0 40px;
+        text-align: center;
+      }
+      #message p {
+        line-height: 140%;
+        margin: 16px 0 24px;
+        font-size: 14px;
+      }
+      .disclaimer {
+        color: rgba(0, 0, 0, 0.4);
+        text-align: center;
+        font-size: 13px;
+      }
+      @media (max-width: 600px) {
+        body,
+        #message {
+          margin-top: 0;
+          background: white;
+          box-shadow: none;
+        }
+      }
+      .status {
+        padding: 10px 0;
+        margin: 10px 0;
+      }
+
+      .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 320px;
+        text-align: center;
+        background: #039be5;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: white;
+        padding: 16px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+      }
+      .button:disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        background: #bebebe;
+      }
+      .input-username {
+        height: 30px;
+        width: 300px;
+        font-size: 18px;
+        line-height: 18px;
+        padding: 5px 10px;
+        border: 1px solid #b3b3b3;
+        border-radius: 5px;
+      }
+      .input-username:not(:placeholder-shown):not(:focus):invalid {
+        border-color: red;
+      }
+      .circle {
+        display: inline-flex;
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        margin: 0 7px;
+      }
+      .circle.green {
+        background-color: green;
+      }
+      .circle.red {
+        background-color: red;
+      }
+      .circle.gray {
+        background-color: gray;
+      }
+
+      .status {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      .status-label {
+        color: #b3b3b3;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .status-message {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        font-weight: bold;
+      }
+      .status-message.hidden {
+        display: none;
+      }
+    </style>
+    <meta name="google-site-verification" content="gwkq45t-LyUlkQ9JsC47Nc8rXneQmddH__z-mWZlEcU" />
+  </head>
+  <body>
+    <form id="message" onsubmit="return false">
+      <h1>Check Instagram Username Availability</h1>
+      <input
+        id="username"
+        type="text"
+        name="username"
+        title="Username must contain only letters, numbers, periods and underscores. Min 3, max 30 chars"
+        class="input-username"
+        minlength="3"
+        maxlength="30"
+        required
+        placeholder="username"
+        pattern="[A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))"
+        onKeyup="checkform()"
+      />
+
+      <div class="status">
+        <span class="status-label">STATUS</span>
+        <div class="status-message hidden" id="status-ok">
+          <span class="circle green"></span>
+          Available
+        </div>
+        <div class="status-message hidden" id="status-error">
+          <span class="circle red"></span>
+          Not Available
+        </div>
+        <div class="status-message" id="status-pending">
+          <span class="circle gray"></span>
+          Not Tested
+        </div>
+      </div>
+      <input id="submit" type="submit" class="button" value="Check" disabled />
+    </form>
+    <p class="disclaimer">Please note we are not affiliated with Instagram.</p>
+
+    <script>
+      const statusOk = document.getElementById("status-ok");
+      const statusError = document.getElementById("status-error");
+      const statusPending = document.getElementById("status-pending");
+
+      function checkform() {
+        const input = document.getElementById("username");
+        document.getElementById("submit").disabled = !input.validity.valid;
+        setStatusPending();
+      }
+
+      function setStatusOk() {
+        statusPending.classList.add("hidden");
+        statusError.classList.add("hidden");
+        statusOk.classList.remove("hidden");
+      }
+
+      function setStatusError() {
+        statusPending.classList.add("hidden");
+        statusOk.classList.add("hidden");
+        statusError.classList.remove("hidden");
+      }
+
+      function setStatusPending() {
+        statusPending.classList.remove("hidden");
+        statusOk.classList.add("hidden");
+        statusError.classList.add("hidden");
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const submit = document.getElementById("submit");
+        const result = document.getElementById("result");
+
+        submit.onclick = () => {
+          const value = document.getElementById("username").value;
+          const url = `https://us-central1-instagram-username.cloudfunctions.net/check/check?username=${value}`;
+          submit.disabled = true;
+
+          fetch(url)
+            .then(({ available }) => {
+              submit.disabled = false;
+              setStatusOk();
+            })
+            .catch(error => {
+              const msg = error.message
+                ? error.message
+                : "Error. Try again, please.";
+              submit.disabled = false;
+              setStatusError(msg);
+            });
+        };
+      });
+    </script>
+  </body>
+</html>

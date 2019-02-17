@@ -1,0 +1,27 @@
+{
+  "name": "instagram-username",
+  "version": "0.0.1",
+  "description": "Check Instagram Username Availability",
+  "main": "index.js",
+  "scripts": {
+    "start": "firebase serve",
+    "deploy": "firebase deploy",
+    "deploy:functions": "firebase deploy --only functions"
+  },
+  "keywords": [
+    "instagram",
+    "api",
+    "nodejs",
+    "firebase"
+  ],
+  "author": "Mladen Ruzicic <ruzicic@gmail.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "firebase-admin": "7.0.0",
+    "firebase-functions": "2.2.0"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "private": true
+}
