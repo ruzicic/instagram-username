@@ -11,6 +11,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "api",
+        "function": "api"
+      }
     ]
   }
 }

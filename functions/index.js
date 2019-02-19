@@ -45,7 +45,7 @@ app.get("/check", async (req, res) => {
   try {
     await page.waitForSelector(selectors.errorIcon, {
       visible: true,
-      timeout: 500
+      timeout: 250
     });
 
     available = false;
@@ -61,4 +61,5 @@ app.get("/check", async (req, res) => {
 });
 
 const opts = { memory: "2GB", timeoutSeconds: 60 };
-exports.check = functions.runWith(opts).https.onRequest(app);
+exports.api = functions.runWith(opts).https.onRequest(app);
+
