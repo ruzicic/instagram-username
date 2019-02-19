@@ -46,11 +46,14 @@
         font-size: 13px;
       }
       .copy {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         color: rgba(0, 0, 0, 0.4);
-        text-align: center;
         font-size: 13px;
       }
       .copy a {
+        margin: 0 5px;
         color: rgba(0, 0, 0, 0.4);
       }
       @media (max-width: 600px) {
@@ -114,6 +117,24 @@
       .circle.gray {
         background-color: gray;
       }
+      .spinner-wrapper {
+        position: relative;
+        margin: 0 10px;
+        height: 20px;
+        width: 20px;
+        display: inline-block;
+      }
+
+      .spinner {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border: 4px solid gray;
+        border-right-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        animation: rotate 750ms infinite;
+      }
 
       .status {
         display: flex;
@@ -133,6 +154,15 @@
       }
       .status-message.hidden {
         display: none;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
     </style>
     <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase-app.js"></script>
@@ -180,7 +210,7 @@
         required
         placeholder="username"
         pattern="[A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))"
-        onKeyup="checkform()"
+        onKeyup="onInputChange(event)"
       />
 
       <div class="status">
@@ -197,12 +227,21 @@
           <span class="circle gray"></span>
           Not Tested
         </div>
+        <div class="status-message hidden" id="status-loading">
+            <div class="spinner-wrapper">
+                <span class="spinner"></span>
+            </div>
+          Loading
+        </div>
       </div>
-      <input id="submit" type="submit" class="button" value="Check" disabled />
+      <input id="submit" type="submit" class="button" value="Check" disabled onclick="handleSubmit()" />
     </form>
-    <p class="disclaimer">Please note we are not affiliated with Instagram.</p>
+    <p class="disclaimer">Please note that this website is not affiliated, associated, authorized, endorsed by,<br> or in any way officially connected with Instagram.</p>
     <div class="copy">
-      Feel free to <a href="mailto:hello@instagram-username.com">say hello</a>.
+      Feel free to <a href="mailto:hello@instagram-username.com">say hello</a>
+      <a href="https://github.com/cedevita/instagram-username" target="_blank" rel="noopener noreferrer">
+        <img width="20" height="20" src="/github-icon.svg" alt="Instagram Username Github">
+      </a>
     </div>
 
     <script>
@@ -215,25 +254,38 @@
       firebase.initializeApp(firebaseConfig);
       const check = firebase.functions().httpsCallable('check_internal');
 
+      const input = document.getElementById("username");
+      const submit = document.getElementById("submit");
+      const result = document.getElementById("result");
       const statusOk = document.getElementById("status-ok");
       const statusError = document.getElementById("status-error");
       const statusPending = document.getElementById("status-pending");
+      const statusLoading = document.getElementById("status-loading");
 
-      function checkform() {
-        const input = document.getElementById("username");
-        document.getElementById("submit").disabled = !input.validity.valid;
+      function onInputChange(e) {
+        const key = e.which || e.keyCode;
+        if (key === 13) {
+          // Enter key pressed
+          return handleSubmit();
+        }
+
+        submit.disabled = !document.getElementById("username").validity.valid;
         setStatusPending();
       }
 
       function setStatusOk() {
+        submit.disabled = false;
         statusPending.classList.add("hidden");
         statusError.classList.add("hidden");
+        statusLoading.classList.add("hidden");
         statusOk.classList.remove("hidden");
       }
 
       function setStatusError() {
+        submit.disabled = false;
         statusPending.classList.add("hidden");
         statusOk.classList.add("hidden");
+        statusLoading.classList.add("hidden");
         statusError.classList.remove("hidden");
       }
 
@@ -241,27 +293,29 @@
         statusPending.classList.remove("hidden");
         statusOk.classList.add("hidden");
         statusError.classList.add("hidden");
+        statusLoading.classList.add("hidden");
       }
 
-      document.addEventListener("DOMContentLoaded", function() {
-        const submit = document.getElementById("submit");
-        const result = document.getElementById("result");
+      function setStatusLoading() {
+        submit.disabled = true;
+        statusPending.classList.add("hidden");
+        statusOk.classList.add("hidden");
+        statusError.classList.add("hidden");
+        statusLoading.classList.remove("hidden");
+      }
 
-        submit.onclick = async () => {
-          submit.disabled = true;
+      async function handleSubmit() {
+        setStatusLoading();
 
-          try {
-            const {value} = document.getElementById("username");
-            const result = await check({text: value});
-            submit.disabled = false;
-            result.data ? setStatusOk() : setStatusError();
-          } catch (error) {
-            submit.disabled = false;
-            const { message = "Unknown error occured."} = error;
-            setStatusError(message);
-          }
-        };
-      });
+        try {
+          const {value} = document.getElementById("username");
+          const result = await check({text: value});
+          result.data ? setStatusOk() : setStatusError();
+        } catch (error) {
+          const { message = "Unknown error occurred."} = error;
+          setStatusError(message);
+        }
+      }
     </script>
   </body>
 </html>
