@@ -135,6 +135,8 @@
         display: none;
       }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase-functions.js"></script>
     <meta
       name="google-site-verification"
       content="gwkq45t-LyUlkQ9JsC47Nc8rXneQmddH__z-mWZlEcU"
@@ -204,6 +206,15 @@
     </div>
 
     <script>
+      const firebaseConfig = {
+        apiKey: 'AIzaSyBvf19tHXWFBt7rA0K6uG21uHPQodzlfSc',
+        authDomain: 'instagram-username.firebaseapp.com',
+        projectId: 'instagram-username',
+        databaseURL: 'https://instagram-username.firebaseio.com',
+      };
+      firebase.initializeApp(firebaseConfig);
+      const check = firebase.functions().httpsCallable('check_internal');
+
       const statusOk = document.getElementById("status-ok");
       const statusError = document.getElementById("status-error");
       const statusPending = document.getElementById("status-pending");
@@ -236,27 +247,19 @@
         const submit = document.getElementById("submit");
         const result = document.getElementById("result");
 
-        submit.onclick = () => {
-          const value = document.getElementById("username").value;
-          const url = `https://us-central1-instagram-username.cloudfunctions.net/check/check?username=${value}`;
+        submit.onclick = async () => {
           submit.disabled = true;
 
-          fetch(url)
-            .then(({ available }) => {
-              submit.disabled = false;
-              if (available) {
-                setStatusOk();
-              } else {
-                setStatusError();
-              }
-            })
-            .catch(error => {
-              const msg = error.message
-                ? error.message
-                : "Error. Try again, please.";
-              submit.disabled = false;
-              setStatusError(msg);
-            });
+          try {
+            const {value} = document.getElementById("username");
+            const result = await check({text: value});
+            submit.disabled = false;
+            result.data ? setStatusOk() : setStatusError();
+          } catch (error) {
+            submit.disabled = false;
+            const { message = "Unknown error occured."} = error;
+            setStatusError(message);
+          }
         };
       });
     </script>

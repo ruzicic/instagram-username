@@ -6,7 +6,9 @@
   "scripts": {
     "start": "firebase serve",
     "deploy": "firebase deploy",
-    "deploy:functions": "firebase deploy --only functions"
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:functions:check": "firebase deploy --only functions:check",
+    "deploy:hosting": "firebase deploy --only hosting"
   },
   "keywords": [
     "instagram",
@@ -22,6 +24,5 @@
   },
   "engines": {
     "node": "8"
-  },
-  "private": true
+  }
 }
