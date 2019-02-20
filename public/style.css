@@ -94,12 +94,16 @@ h3 {
   letter-spacing: -0.1px;
   margin-top: 0;
   font-weight: 400;
+  max-width: 90%;
+	text-align: center;
 }
 pre {
-    color: #0366d6;
+  color: #0366d6;
 	background-color: #eaf5ff;
 	border-radius: 3px;
-	padding: 15px 17px;
+  padding: 15px 17px;
+  max-width: 80%;
+	overflow: scroll;
 }
 p {
   line-height: 140%;
